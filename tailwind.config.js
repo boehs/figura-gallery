@@ -7,7 +7,7 @@ module.exports = {
       './views/**/*.ejs'
     ]
   },
-  darkMode: 'media', // or 'media' or 'class'
+  darkMode: 'class', // or 'media' or 'class'
   theme: {
     maxWidth: {
       '10r': '10rem',

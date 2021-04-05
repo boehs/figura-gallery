@@ -1,18 +1,15 @@
-let darkMode = false
-
 document.addEventListener("DOMContentLoaded", () => {
-    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        darkMode = true
-    } else if (document.body.classList.contains("dark-mode")) {
-        darkMode = true
+
+    if (localStorage.theme == 'dark') {
+        document.querySelector("body > section.relative.w-full.px-8.text-gray-700.dark\\:text-white.bg-white.dark\\:bg-gray-800.body-font > div > div > a:nth-child(2)").classList.remove('hidden')
+    } else {
+        document.querySelector("body > section.relative.w-full.px-8.text-gray-700.dark\\:text-white.bg-white.dark\\:bg-gray-800.body-font > div > div > a:nth-child(1)").classList.remove('hidden')
     }
 
-    if (darkMode) {
-        if (!document.body.classList.contains("dark-mode")) {
-            document.body.classList.add("dark-mode")
-        }
-    } else if (document.body.classList.contains("dark-mode")) {
-        document.body.classList.remove("dark-mode")
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.body.classList.add('dark')
+    } else {
+        document.body.classList.remove('dark')
     }
     
 })
