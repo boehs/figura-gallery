@@ -30,4 +30,6 @@ app.get('/testing-three', (req, res) => {
     res.render('test')
 })
 
-server.listen(3000)
+server.listen(3000, () => {
+    console.log(`The application started on port ${server.address().port}`);
+})
