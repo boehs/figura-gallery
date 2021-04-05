@@ -10,7 +10,6 @@ function getModel(player, callback) {
         else {
             // let url = "http://tmshader.me/figura-test/" + res[0].id + ".json";
             let url = "http://figura.blancworks.org/api/avatar/" + res[0].id;
-            console.log(url)
             
             let settings = {
                 method: "GET"
