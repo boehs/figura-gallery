@@ -1,0 +1,11 @@
+<%- include('header', { title: user }); -%>
+
+<div id="canvas"></div>
+
+<%- include('footer'); -%>
+
+<script> var data = atob("<%- data %>"); </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="../../scripts/gunzip.min.js"></script>
+<script src="../../scripts/nbt.js"></script>
+<script type="module" src="../../model_display_new.js"></script>

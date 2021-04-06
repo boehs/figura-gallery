@@ -1,15 +1,13 @@
 import * as THREE from 'https://unpkg.com/three@latest/build/three.module.js';
+// import nbt from 'https://unpkg.com/nbt@latest/nbt.js';
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x202030);
 scene.rotation.y = THREE.Math.degToRad(180)
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / (window.innerHeight - (82 + 88)), 0.1, 1000);
 var renderer = new THREE.WebGLRenderer();
 var group = new THREE.Group();
-
-var loaded_texture = new THREE.TextureLoader().load("data:image/png;base64," + texture);
-loaded_texture.magFilter = THREE.NearestFilter;
 
 var x_val = []
 var x_pos = 0
@@ -27,39 +25,114 @@ var x_rot = 0
 var y_rot = 0
 var z_rot = 0
 
-for (var part of model) {
+var cyc = 0
+var prev = "";
 
-    preProcessCubes(part)
+var loaded_texture;
 
-    /* var raw_offset = findOffset(cube)
-    var offset = raw_offset[0]
-    var render = raw_offset[1]
-    if (!render) { continue }*/
+var mouseDown = false,
+mouseX = 0,
+mouseY = 0;
 
-    /* for (var cube of part.chld.value.value) {
-        if (cube.hasOwnProperty('chld')) {
-            for (var cube2 of cube.chld.value.value) { 
-                var raw_offset = findOffset(cube2)
-                var offset = raw_offset[0]
-                var render = raw_offset[1]
-                if (!render) { continue }
-                addCube(cube2, offset)
-            }
-            continue
-        }
-        var raw_offset = findOffset(cube)
+var container = document.getElementById( 'canvas' );
+renderer.setSize(window.innerWidth, window.innerHeight - (82 + 88));
+container.appendChild(renderer.domElement);
+camera.position.z = 40;
+
+container.mouseIsOver = false;
+
+container.onmouseover = function() {
+    this.mouseIsOver = true;
+};
+container.onmouseout = function() {
+    this.mouseIsOver = false;
+};
+
+document.addEventListener('mousewheel', (event) => {
+    if (container.mouseIsOver) {
+        camera.position.z += event.deltaY / 5;
+    }
+});
+
+addMouseHandler(document)
+
+nbt.parse(stringToArrayBuffer(data), function (error, data) {
+    if (error) {
+        throw error;
+    }
+
+    let model = data.value.model.value.parts.value.value
+    var texture = btoa(String.fromCharCode(...new Uint8Array(data.value.texture.value.img2.value)))
+    console.log("data:image/png,base64," + texture)
+    // let model = JSON.stringify(data.value.model.value.parts.value.value);
+    // var texture = Buffer.from(data.value.texture.value.img2.value).toString('base64');
+
+    loaded_texture = new THREE.TextureLoader().load("data:image/png;base64," + texture);
+    loaded_texture.magFilter = THREE.NearestFilter;
+
+    for (var part of model) {
+
+        preProcessCubes(part)
+
+        /* var raw_offset = findOffset(cube)
         var offset = raw_offset[0]
         var render = raw_offset[1]
-        if (!render) { continue }
-        addCube(cube, offset)
-    } */
+        if (!render) { continue }*/
+
+        /* for (var cube of part.chld.value.value) {
+            if (cube.hasOwnProperty('chld')) {
+                for (var cube2 of cube.chld.value.value) { 
+                    var raw_offset = findOffset(cube2)
+                    var offset = raw_offset[0]
+                    var render = raw_offset[1]
+                    if (!render) { continue }
+                    addCube(cube2, offset)
+                }
+                continue
+            }
+            var raw_offset = findOffset(cube)
+            var offset = raw_offset[0]
+            var render = raw_offset[1]
+            if (!render) { continue }
+            addCube(cube, offset)
+        } */
+    }
+
+    for (var i = 0; i < x_val.length; i++) {
+        x_pos += x_val[i]
+        x_cycle = i + 1
+    }
+    x_pos = x_pos / x_cycle
+
+    for (var i = 0; i < y_val.length; i++) {
+        y_pos += y_val[i]
+        y_cycle = i + 1
+    }
+    y_pos = y_pos / y_cycle
+
+    scene.add(group)
+
+    animate();
+});
+
+function stringToArrayBuffer(str) {
+    if (typeof str !== 'string') throw 'str must be a string';
+    var i, x, arr = new Uint8Array(str.length);
+    for (i = 0; i < str.length; i++) {
+        x = str.charCodeAt(i);
+        if (x < 0 || x > 255) throw 'Element ' + i + ' out of range: ' + x;
+        arr[i] = x;
+    }
+    return arr.buffer;
 }
 
 function preProcessCubes(part) {
     var raw_offset = findOffset(part)
     var offset = raw_offset[0]
     var render = raw_offset[1]
-    if (!render) { return }
+    if (!render) {
+        return
+    }
 
     processCubes(part, offset)
 }
@@ -67,7 +140,7 @@ function preProcessCubes(part) {
 function processCubes(part, offset) {
     if (part.hasOwnProperty('chld')) {
         window[part.nm.value] = new THREE.Group();
-        /*window[part.nm.value].position.set(
+        /* window[part.nm.value].position.set(
             part.piv.value.value[0],
             part.piv.value.value[1],
             part.piv.value.value[2]
@@ -89,13 +162,17 @@ function processCubes(part, offset) {
             z_rot += (THREE.Math.degToRad(part.rot.value.value[2]))
         }*/
 
-        scene.add( window[part.nm.value] )
+        scene.add(window[part.nm.value])
 
         for (var cube of part.chld.value.value) {
             if (cube.hasOwnProperty('chld')) {
-                processCubes(cube)
+                var raw_offset = findOffset(cube)
+                var offset = raw_offset[0]
+                var render = raw_offset[1]
+                if (!render) return
+                processCubes(cube, offset)
             } else {
-//                addCube(cube, offset, window[part.nm.value], [x_piv, y_piv, z_piv], [x_rot, y_rot, z_rot])
+                // addCube(cube, offset, window[part.nm.value], [x_piv, y_piv, z_piv], [x_rot, y_rot, z_rot])
 
                 x_piv = 0
                 y_piv = 0
@@ -114,35 +191,35 @@ function processCubes(part, offset) {
 }
 
 function findOffset(part) {
-    var offset = [ 0, 0, 0 ]
+    var offset = [0, 0, 0]
     var render = true
 
     if (part.nm.value.includes("NOLOAD")) {
         render = false
     } else if (part.nm.value.includes("HEAD")) {
-        offset = [ 0, 0, 0 ]
+        offset = [0, 0, 0]
     } else if (part.nm.value.includes("TORSO")) {
-        offset = [ 0, 0, 0 ]
+        offset = [0, 0, 0]
     } else if (part.nm.value.includes("LEFT_ARM")) {
-        offset = [ -5.5, -2, 0 ]
+        offset = [-5.5, -2, 0]
     } else if (part.nm.value.includes("RIGHT_ARM")) {
-        offset = [ 5.5, -2, 0 ]
+        offset = [5.5, -2, 0]
     } else if (part.nm.value.includes("LEFT_LEG")) {
-        offset = [ -2.1, -12.5, 0 ]
+        offset = [-2.1, -12.5, 0]
     } else if (part.nm.value.includes("RIGHT_LEG")) {
-        offset = [ 2.1, -12.5, 0 ]
+        offset = [2.1, -12.5, 0]
     }
 
     return [offset, render]
 }
 
-function addCube(cube, offset = [0, 0, 0], group, piv_val, rot_val) {    
+function addCube(cube, offset = [0, 0, 0], group, piv_val, rot_val) {
     var from = cube.props.value.f.value.value
     var to = cube.props.value.t.value.value
     var size = to.map(function (x, i) {
         return x - from[i]
     })
-    
+
     offset = offset.map(function (x, i) {
         if (i == 1) {
             return x + 6
@@ -225,54 +302,19 @@ function addCube(cube, offset = [0, 0, 0], group, piv_val, rot_val) {
     group.add(gen_cube)
 }
 
-for (var i = 0; i < x_val.length; i++) {
-    x_pos += x_val[i]
-    x_cycle = i + 1
-}
-x_pos = x_pos / x_cycle
-
-for (var i = 0; i < y_val.length; i++) {
-    y_pos += y_val[i]
-    y_cycle = i + 1
-}
-y_pos = y_pos / y_cycle
-
-
-scene.add( group )
-// group.position.set( - x_pos, - y_pos, 0 )
-
-/*const axesHelper = new THREE.AxesHelper( 50 );
-scene.add( axesHelper );*/
-
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
-// camera.position.y = y_pos;
-// camera.position.x = x_pos;
-camera.position.z = 40;
-
-/* scene.traverse( function( object ) {
-
-    if ( object.isMesh ) console.log( object );
-
-} ); */
-
 function animate() {
     requestAnimationFrame(animate);
 
     renderer.render(scene, camera);
 }
 
-document.addEventListener( 'mousewheel', (event) => {
-    camera.position.z += event.deltaY / 5;
-});
-
-var mouseDown = false,
-    mouseX = 0,
-    mouseY = 0;
-
 function onMouseMove(evt) {
     if (!mouseDown) {
         return;
+    }
+
+    if (!container.mouseIsOver) {
+        return
     }
 
     evt.preventDefault();
@@ -294,7 +336,7 @@ function onMouseDown(evt) {
 
 function onMouseUp(evt) {
     evt.preventDefault();
-    
+
     mouseDown = false;
 }
 
@@ -317,10 +359,6 @@ function rotateScene(deltaX, deltaY) {
     // body.rotation.x += deltaY / 100;
 }
 
-addMouseHandler(document)
-
-animate();
-
-Number.prototype.clamp = function(min, max) {
-  return Math.min(Math.max(this, min), max);
+Number.prototype.clamp = function (min, max) {
+    return Math.min(Math.max(this, min), max);
 };
