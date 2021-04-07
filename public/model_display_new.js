@@ -56,7 +56,7 @@ document.addEventListener('mousewheel', (event) => {
 
 addMouseHandler(document)
 
-nbt.parse(stringToArrayBuffer(data), function (error, data) {
+nbt.parse(stringToArrayBuffer(modelData), function (error, data) {
     if (error) {
         throw error;
     }

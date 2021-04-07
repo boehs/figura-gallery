@@ -1,11 +1,29 @@
 <%- include('header', { title: user }); -%>
 
-<div id="canvas"></div>
+<div id="canvas" style="width: 100vw; height: calc(100vh - (82px + 88px))"></div>
 
 <%- include('footer'); -%>
 
-<script> var data = atob("<%- data %>"); </script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var modelData;
+    var socket = io();
+    socket.emit('getModel', { user: "<%- user %>" });
+
+    socket.on('setModel', function (data) {
+        var body = document.getElementsByTagName('body')[0];
+        var js = document.createElement("script");  
+
+        js.type = "text/javascript";
+        js.src = "../../model_display_new.js"
+        js.type = "module"
+
+        modelData = atob(data.model);
+        body.appendChild(js);
+    })
+</script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script src="../../scripts/gunzip.min.js"></script>
 <script src="../../scripts/nbt.js"></script>
-<script type="module" src="../../model_display_new.js"></script>

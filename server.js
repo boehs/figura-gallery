@@ -1,6 +1,8 @@
 const express = require("express");
 const app = express();
 const server = require("http").Server(app);
+const io = require('socket.io')(server);
+
 const { v4: uuidV4 } = require("uuid");
 const { getModel } = require("./model");
 const { getModel_new } = require("./model_new");
@@ -24,12 +26,15 @@ app.get("/old_u/:user", (req, res) => {
 });
 
 app.get("/u/:user", (req, res) => {
-    getModel_new(req.params.user, function (resp) {
+    res.render("user_new", {
+        user: req.params.user
+    });
+    /*getModel_new(req.params.user, function (resp) {
         res.render("user_new", {
             data: resp.toString(),
             user: req.params.user
         });
-    });
+    });*/
 });
 
 app.get("/m/:model", (req, res) => {
@@ -39,6 +44,14 @@ app.get("/m/:model", (req, res) => {
 app.get("/testing-three", (req, res) => {
     res.render("test")
 });
+
+io.sockets.on('connection', function (socket) {
+    socket.on('getModel', function (data) {
+        getModel_new(data.user, function (resp) {
+            socket.emit('setModel', { model: resp.toString() })
+        });
+    });
+  });
 
 server.listen(3000, () => {
     console.log(`The application started on port ${server.address().port}`);
