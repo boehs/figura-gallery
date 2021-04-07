@@ -8,7 +8,6 @@ const { getModel_new } = require("./model_new");
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use("/models", express.static("models"));
-app.use("/node_modules", express.static("node_modules"));
 
 app.get("/", (req, res) => {
   res.render("index");
