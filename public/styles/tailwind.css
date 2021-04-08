@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.checkered {
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgAQMAAABJtOi3AAAABlBMVEUcHCogIDAw/BwYAAAAFElEQVQIW2NkYPjPwEhFAkRTkQAAE+4gEWpcP7wAAAAASUVORK5CYII=);
+    background-size: auto 12.5%;
+}
+
+.drop-shadow {
+    filter: drop-shadow(-8px 6px 10px rgba(0,0,0,0.4));
+}

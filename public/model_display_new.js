@@ -2,11 +2,12 @@ import * as THREE from 'https://unpkg.com/three@latest/build/three.module.js';
 // import nbt from 'https://unpkg.com/nbt@latest/nbt.js';
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x202030);
+// scene.background = new THREE.Color(0x202030);
 scene.rotation.y = THREE.Math.degToRad(180)
 
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / (window.innerHeight - (82 + 88)), 0.1, 1000);
-var renderer = new THREE.WebGLRenderer();
+// const camera = new THREE.PerspectiveCamera(75, window.innerWidth / (window.innerHeight - (82 + 88)), 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(25, 360 / 360, 0.1, 1000);
+var renderer = new THREE.WebGLRenderer( { alpha: true } );
 var group = new THREE.Group();
 
 var x_val = []
@@ -35,9 +36,10 @@ mouseX = 0,
 mouseY = 0;
 
 var container = document.getElementById( 'canvas' );
-renderer.setSize(window.innerWidth, window.innerHeight - (82 + 88));
-container.appendChild(renderer.domElement);
-camera.position.z = 40;
+renderer.setSize(360, 360);
+// renderer.setSize(window.innerWidth, window.innerHeight - (82 + 88));
+container.appendChild(renderer.domElement).className = "drop-shadow";
+camera.position.z = 100;
 
 container.mouseIsOver = false;
 
@@ -222,7 +224,7 @@ function addCube(cube, offset = [0, 0, 0], group, piv_val, rot_val) {
 
     offset = offset.map(function (x, i) {
         if (i == 1) {
-            return x + 6
+            return x + 7
         } else {
             return x
         }
@@ -313,10 +315,6 @@ function onMouseMove(evt) {
         return;
     }
 
-    if (!container.mouseIsOver) {
-        return
-    }
-
     evt.preventDefault();
 
     var deltaX = evt.clientX - mouseX,
@@ -328,6 +326,10 @@ function onMouseMove(evt) {
 
 function onMouseDown(evt) {
     evt.preventDefault();
+
+    if (!container.mouseIsOver) {
+        return
+    }
 
     mouseDown = true;
     mouseX = evt.clientX;
@@ -354,8 +356,8 @@ function addMouseHandler(canvas) {
 
 function rotateScene(deltaX, deltaY) {
     //body.rotation.y += deltaX / 200;
-    scene.rotation.y += deltaX / 200;
-    scene.rotation.x = (scene.rotation.x + deltaY / 200).clamp(THREE.Math.degToRad(-90), THREE.Math.degToRad(90));
+    scene.rotation.y += deltaX / 100;
+    scene.rotation.x = (scene.rotation.x + deltaY / 100).clamp(THREE.Math.degToRad(-90), THREE.Math.degToRad(90));
     // body.rotation.x += deltaY / 100;
 }
 

@@ -1,10 +1,61 @@
 <%- include('header', { title: user }); -%>
 
-<div id="canvas" style="width: 100vw; height: calc(100vh - (82px + 88px))"></div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 py-8 bg-white dark:bg-gray-800" style="width: 100%; min-height: calc(100vh - (82px + 88px));">
+    <div class="grid grid-flow-row auto-rows-max gap-4 mx-auto md:ml-auto md:mr-0" style="width: 360px;"> <!-- min-height: calc(100vh - (82px + 88px));"> -->
+        <div id="canvas" class="rounded-md border border-gray-200 dark:border-gray-700 cursor-move checkered" style="width: 360px; height: 360px;"></div>
+        <div class="rounded-md text-2xl font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">
+                <div class="min-w-full px-4 py-1 rounded-t-md flex text-base border-b border-gray-200 dark:border-gray-700"><strong>Models</strong></div>
+                <div class="min-w-full rounded-b-md items-center p-3 justify-center text-2xl grid grid-cols-8 auto-rows-min">
+                    <% for (var i = 0; i < 30; i++) { %>
+                        <a href="#">
+                            <!-- <img class="rounded-md m-1" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAABNUlEQVRYR2O00NP+z4AEOFiYkbkMLExMKHxGRkYUPjrn/38U4xj+/PuHouTHn7+o5o06YMBDwFRLAyXSmJhQ45gRLQ2wovHR08BvtDj/j8b/9w81jTCOOmDAQ0BPXQ0lUtiZUfM9eppgY2XFWw78+v0bRR49zn/+RS0XGEcdMOAhYKipjpoGWFlQ4vDIskYUvm9KO940gC75/tsPFKGfv/+g1gWjDhh0ITB78VKUODIxMUHh/7myBm+a2H7iLIr8mTNnUPipsdH408CoA+geAn92TkMpB5jdMlHiSElJCYV/e880vOWAqksWivy9e/dQ+EZaGqhpYNQBAx8CJxaiNtJ4uFHjmBONT1JNwMDA8P0rqo4vqHzGP6MOGPAQQCsHGPjR4pzUNEEgzhk+oqeBUQcMcAgAAL2ySygjYJNUAAAAAElFTkSuQmCC" alt="TMShader"> -->
+                            <img class="rounded-sm m-1" src="https://mc-heads.net/avatar/<%- user -%>/32.png" alt="<%- user -%>">
+                        </a>
+                    <% } %>
+                </div>
+        </div>
+    </div>
+    <div class="grid grid-flow-row auto-rows-max gap-4 mx-auto md:mr-auto md:ml-0" style="width: 360px;"> <!-- min-height: calc(100vh - (82px + 88px));"> -->
+        <!--
+        <div class="rounded-md text-2xl font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">
+            <div class="min-w-full px-4 py-1 rounded-t-md flex text-base border-b border-gray-200 dark:border-gray-700">
+                <strong>Model Information</strong>
+            </div>
+            <div class="min-w-full px-4 py-1 rounded-b-md items-center p-3 justify-center text-2xl">
+                Card Content
+            </div>
+        </div>
+        -->
+        
+        <div class="rounded-md text-2xl font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400">
+            <div class="min-w-full px-4 py-1 rounded-t-md flex text-base border-b border-gray-200 dark:border-gray-700">
+                <strong>Minecraft Profile</strong>
+            </div>
+            <div class="min-w-full px-4 py-1 rounded-b-md p-3 text-base relative">
+                <strong>Formatted UUID</strong>
+                <a class="absolute right-4 cursor-pointer text-green-600 hover:text-green-500 hover:underline" onclick="copyToClipboard('<%- formattedUuid -%>'); effect(this)">Copy</a>
+                <br>
+                <%- formattedUuid -%>
+                <br><br>
+                <strong>UUID</strong>
+                <a class="absolute right-4 cursor-pointer text-green-600 hover:text-green-500 hover:underline" onclick="copyToClipboard('<%- uuid -%>'); effect(this)">Copy</a>
+                <br>
+                <%- uuid -%> 
+                <br><br>
+                <strong>Link</strong>
+                <a class="absolute right-4 cursor-pointer text-green-600 hover:text-green-500 hover:underline" onclick="copyToClipboard('<%- page -%>'); effect(this)">Copy</a>
+                <br>
+                <a href="<%- fullPage -%>" class="cursor-pointer text-green-600 hover:text-green-500 hover:underline"><%- page -%></a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <%- include('footer'); -%>
 
 <script src="/socket.io/socket.io.js"></script>
+<script src="../../../scripts/user.js"></script>
+
 <script>
     var modelData;
     var socket = io();
@@ -24,6 +75,5 @@
 </script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <script src="../../scripts/gunzip.min.js"></script>
 <script src="../../scripts/nbt.js"></script>

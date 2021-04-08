@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
 const server = require("http").Server(app);
-const io = require('socket.io')(server);
+const io = require("socket.io")(server);
+const fetch = require("node-fetch");
 
 const { v4: uuidV4 } = require("uuid");
 const { getModel } = require("./model");
@@ -25,16 +26,15 @@ app.get("/old_u/:user", (req, res) => {
     });
 });
 
-app.get("/u/:user", (req, res) => {
+app.get("/u/:user", async (req, res) => {
+    var uuid = await getId(req.params.user)
     res.render("user_new", {
-        user: req.params.user
+        page: req.get('host') + req.originalUrl,
+        fullPage: req.protocol + '://' + req.get('host') + req.originalUrl,
+        user: req.params.user,
+        uuid: uuid,
+        formattedUuid: uuid.replace(/(........)(....)(....)(....)(............)/gi, "$1-$2-$3-$4-$5"),
     });
-    /*getModel_new(req.params.user, function (resp) {
-        res.render("user_new", {
-            data: resp.toString(),
-            user: req.params.user
-        });
-    });*/
 });
 
 app.get("/m/:model", (req, res) => {
@@ -56,3 +56,9 @@ io.sockets.on('connection', function (socket) {
 server.listen(3000, () => {
     console.log(`The application started on port ${server.address().port}`);
 });
+
+function getId(playername) {
+    return fetch(`https://api.mojang.com/users/profiles/minecraft/${playername}`)
+      .then(data => data.json())
+      .then(player => player.id);
+}
