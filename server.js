@@ -3,14 +3,22 @@ const app = express();
 const server = require("http").Server(app);
 const io = require("socket.io")(server);
 const fetch = require("node-fetch");
+const bodyParser = require("body-parser");
+const dotenv = require("dotenv");
+const user = require("./routes/user");
+const InitiateMongoServer = require("./config/db");
 
 const { v4: uuidV4 } = require("uuid");
 const { getModel } = require("./model");
 const { getModel_new } = require("./model_new");
 
+dotenv.config();
+InitiateMongoServer();
+
 app.set("view engine", "ejs");
 app.use(express.static("public"));
-app.use("/models", express.static("models"));
+app.use(bodyParser.json());
+app.use("/api/user", user);
 
 app.get("/", (req, res) => {
   res.render("index");
@@ -51,9 +59,11 @@ io.sockets.on('connection', function (socket) {
             socket.emit('setModel', { model: resp.toString() })
         });
     });
-  });
+});
 
-server.listen(3000, () => {
+const port = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 3000;
+
+server.listen(port, () => {
     console.log(`The application started on port ${server.address().port}`);
 });
 
