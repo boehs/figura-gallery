@@ -204,7 +204,6 @@ router.post("/start-link", auth, async (req, res) => {
 router.post("/stop-link", auth, async (req, res) => {
     try {
         const user = await User.findById(req.user.id);
-        const code = await generateCode()
         const email = user.email;
         const {
             code,
@@ -226,10 +225,6 @@ router.post("/stop-link", auth, async (req, res) => {
                 message: "Wrong code"
             });
         }
-
-        let user = await User.findOne({
-            email
-        });
 
         user.uuid = link.uuid
 
