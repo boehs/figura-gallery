@@ -8,8 +8,8 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 const auth = require("../middleware/auth");
 
-const User = require("../model/User");
-const Link = require("../model/Link");
+const User = require("../model/user.js");
+const Link = require("../model/link.js");
 
 router.post(
     "/signup",
