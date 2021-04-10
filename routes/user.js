@@ -230,7 +230,7 @@ router.post("/stop-link", auth, async (req, res) => {
 
         await user.save();
         await link.remove();
-        
+
         return res.status(200).json({
             message: "Success!"
         });
@@ -242,7 +242,7 @@ router.post("/stop-link", auth, async (req, res) => {
 });
 
 router.get("/code/:username", async (req, res) => {
-    if (req.header("token") == process.env.token) {
+    if (req.header("token") == process.env.TOKEN) {
         try {
             let username = req.params.username;
             const link = await Link.findOne({
