@@ -9,6 +9,7 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 
 const User = require("../model/User");
+const Link = require("../model/Link");
 
 router.post(
     "/signup",
@@ -147,12 +148,141 @@ router.get("/me", auth, async (req, res) => {
     try {
         // request.user is getting fetched from Middleware after token authentication
         const user = await User.findById(req.user.id);
-        res.json(user);
+        return res.status(200).json(user);
     } catch (e) {
-        res.send({
+        return res.status(400).json({
             message: "Error in Fetching user"
         });
     }
 });
 
+router.post("/start-link", auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const code = await generateCode()
+        const email = user.email;
+        const {
+            username
+        } = req.body;
+
+        let link = await Link.findOne({
+            email
+        });
+
+        if (link) {
+            return res.status(400).json({
+                message: "User already linking"
+            });
+        }
+
+        link = await Link.findOne({
+            username
+        });
+
+        if (link) {
+            return res.status(400).json({
+                message: "User already getting linked"
+            });
+        }
+
+        link = new Link({
+            code,
+            email,
+            username,
+        })
+        await link.save();
+        return res.status(200).json({
+            message: "Success!"
+        });
+    } catch (e) {
+        return res.status(500).json({
+            message: "Error in starting link"
+        });
+    }
+});
+
+router.post("/stop-link", auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        const code = await generateCode()
+        const email = user.email;
+        const {
+            code,
+            username
+        } = req.body;
+
+        let link = await Link.findOne({
+            email
+        });
+
+        if (!link) {
+            return res.status(404).json({
+                message: "Link not found"
+            });
+        }
+
+        if (link.code != code) {
+            return res.status(400).json({
+                message: "Wrong code"
+            });
+        }
+
+        let user = await User.findOne({
+            email
+        });
+
+        user.uuid = link.uuid
+
+        await user.save();
+        return res.status(200).json({
+            message: "Success!"
+        });
+    } catch (e) {
+        return res.status(500).json({
+            message: "Error in stopping link"
+        });
+    }
+});
+
+router.get("/code/:username", async (req, res) => {
+    if (req.header("token") == process.env.token) {
+        try {
+            let username = req.params.username;
+            const link = await Link.findOne({
+                username
+            });
+
+            if (link) {
+                link.uuid = req.header("uuid");
+                link.save()
+                return res.status(200).json(link);
+            } else {
+                return res.status(404).json({
+                    message: "No pending links"
+                });
+            }
+        } catch (e) {
+            return res.status(500).json({
+                message: "Error in Fetching link"
+            });
+        }
+    } else {
+        return res.status(401).json({
+            message: "Authentication failed"
+        });
+    }
+});
+
 module.exports = router;
+
+async function generateCode() {
+    code = Math.floor(100000 + Math.random() * 900000);
+    link = await Link.findOne({
+        code
+    });
+    if (link) {
+        await generateCode();
+    } else {
+        return code
+    }
+}

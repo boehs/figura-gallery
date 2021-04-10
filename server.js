@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 app.use("/api/user", user);
 
 app.get("/", (req, res) => {
-  res.render("index");
+    res.render("index");
 });
 
 app.get("/old_u/:user", (req, res) => {
