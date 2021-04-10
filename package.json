@@ -8,6 +8,10 @@
     "devStart": "nodemon server.js",
     "tailwind:css": "postcss public/styles/tailwind.css -o public/styles/style.css"
   },
+  "engines": {
+    "node": "14.15.1",
+    "npm": "7.6.3"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
