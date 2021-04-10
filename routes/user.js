@@ -226,9 +226,11 @@ router.post("/stop-link", auth, async (req, res) => {
             });
         }
 
-        user.uuid = link.uuid
+        user.minecraftUUID = link.uuid
 
         await user.save();
+        await link.remove();
+        
         return res.status(200).json({
             message: "Success!"
         });
