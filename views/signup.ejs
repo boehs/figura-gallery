@@ -1,0 +1,33 @@
+<form id="formsignin">
+    <input type="email" id="email" name="email" placeholder="email" autocomplete="off" autofocus />
+    <input type="text" id="username" name="username" placeholder="username" autocomplete="on" />
+    <input type="password" id="password" name="password" placeholder="Password" />
+    <button type="submit">Submit form</button>
+</form>
+<div id="tips"></div>
+
+<script type="module">
+    function formstuff(e) {
+        e.preventDefault();
+        var data = JSON.stringify(Object.fromEntries(new FormData(form).entries()))
+        console.log(data)
+        fetch("../api/user/signup", {
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: data
+        }).then(response => {
+            response.text().then(resjson => {
+                var res = JSON.parse(resjson)
+                if (response.ok) {
+                    localStorage.setItem('token', res.token);
+                } else {
+                    
+                }
+            })
+        })
+    };
+    const form = document.getElementById('formsignin');
+    form.addEventListener('submit', formstuff);
+</script>
