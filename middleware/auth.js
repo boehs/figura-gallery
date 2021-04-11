@@ -7,7 +7,7 @@ module.exports = function (req, res, next) {
     });
 
     try {
-        const decoded = jwt.verify(token, "randomString");
+        const decoded = jwt.verify(token, process.env.KEY);
         req.user = decoded.user;
         next();
     } catch (e) {
