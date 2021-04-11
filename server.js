@@ -21,54 +21,66 @@ app.use(bodyParser.json());
 app.use("/api/user", user);
 
 app.get("/", (req, res) => {
-    res.render("index");
+  res.render("index");
 });
 
 app.get("/old_u/:user", (req, res) => {
-    getModel(req.params.user, function (resp) {
-        res.render("user", {
-            model: resp[0],
-            texture: resp[1],
-            user: req.params.user
-        });
+  getModel(req.params.user, function (resp) {
+    res.render("user", {
+      model: resp[0],
+      texture: resp[1],
+      user: req.params.user,
     });
+  });
 });
 
 app.get("/u/:user", async (req, res) => {
-    var uuid = await getId(req.params.user)
-    res.render("user_new", {
-        page: req.get('host') + req.originalUrl,
-        fullPage: req.protocol + '://' + req.get('host') + req.originalUrl,
-        user: req.params.user,
-        uuid: uuid,
-        formattedUuid: uuid.replace(/(........)(....)(....)(....)(............)/gi, "$1-$2-$3-$4-$5"),
-    });
+  var uuid = await getId(req.params.user);
+  res.render("user_new", {
+    page: req.get("host") + req.originalUrl,
+    fullPage: req.protocol + "://" + req.get("host") + req.originalUrl,
+    user: req.params.user,
+    uuid: uuid,
+    formattedUuid: uuid.replace(
+      /(........)(....)(....)(....)(............)/gi,
+      "$1-$2-$3-$4-$5"
+    ),
+  });
 });
 
 app.get("/m/:model", (req, res) => {
-    res.render("model", { model: req.params.model })
+  res.render("model", { model: req.params.model });
 });
 
 app.get("/testing-three", (req, res) => {
-    res.render("test")
+  res.render("test");
 });
 
-io.sockets.on('connection', function (socket) {
-    socket.on('getModel', function (data) {
-        getModel_new(data.user, function (resp) {
-            socket.emit('setModel', { model: resp.toString() })
-        });
+io.sockets.on("connection", function (socket) {
+  socket.on("getModel", function (data) {
+    getModel_new(data.user, function (resp) {
+      socket.emit("setModel", { model: resp.toString() });
     });
+  });
 });
 
-const port = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 3000;
+const port =
+  process.env.NODE_ENV === "production" ? process.env.PORT || 80 : 3000;
 
 server.listen(port, () => {
-    console.log(`The application started on port ${server.address().port}`);
+  console.log(`The application started on port ${server.address().port}`);
+});
+
+app.get("/login", (req, res) => {
+  res.render("login");
+});
+
+app.get("/signup", (req, res) => {
+  res.render("signup");
 });
 
 function getId(playername) {
-    return fetch(`https://api.mojang.com/users/profiles/minecraft/${playername}`)
-      .then(data => data.json())
-      .then(player => player.id);
+  return fetch(`https://api.mojang.com/users/profiles/minecraft/${playername}`)
+    .then((data) => data.json())
+    .then((player) => player.id);
 }
