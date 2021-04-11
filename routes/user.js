@@ -5,6 +5,7 @@ const {
 } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const sanitize = require('mongo-sanitize');
 const router = express.Router();
 const auth = require("../middleware/auth");
 
@@ -30,11 +31,16 @@ router.post(
             });
         }
 
-        const {
+        var {
             username,
             email,
             password
         } = req.body;
+
+        username = sanitize(username)
+        email = sanitize(email)
+        password = sanitize(password)
+
         try {
             let user = await User.findOne({
                 email
@@ -64,7 +70,7 @@ router.post(
 
             jwt.sign(
                 payload,
-                "randomString", {
+                process.env.KEY, {
                     expiresIn: 10000
                 },
                 (err, token) => {
@@ -98,10 +104,14 @@ router.post(
             });
         }
 
-        const {
+        var {
             email,
             password
         } = req.body;
+
+        email = sanitize(email)
+        password = sanitize(password)
+
         try {
             let user = await User.findOne({
                 email
@@ -125,7 +135,7 @@ router.post(
 
             jwt.sign(
                 payload,
-                "randomString", {
+                process.env.KEY, {
                     expiresIn: 3600
                 },
                 (err, token) => {
@@ -161,9 +171,11 @@ router.post("/start-link", auth, async (req, res) => {
         const user = await User.findById(req.user.id);
         const code = await generateCode()
         const email = user.email;
-        const {
+        var {
             username
         } = req.body;
+
+        username = sanitize(username)
 
         let link = await Link.findOne({
             email
@@ -210,6 +222,9 @@ router.post("/stop-link", auth, async (req, res) => {
             username
         } = req.body;
 
+        code = sanitize(code)
+        username = sanitize(username)
+
         let link = await Link.findOne({
             email
         });
@@ -227,6 +242,7 @@ router.post("/stop-link", auth, async (req, res) => {
         }
 
         user.minecraftUUID = link.uuid
+        user.username = link.username
 
         await user.save();
         await link.remove();
@@ -245,6 +261,8 @@ router.get("/code/:username", async (req, res) => {
     if (req.header("token") == process.env.TOKEN) {
         try {
             let username = req.params.username;
+            username = sanitize(username)
+
             const link = await Link.findOne({
                 username
             });

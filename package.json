@@ -26,6 +26,7 @@
     "express-validator": "^6.10.0",
     "jsonwebtoken": "^8.5.1",
     "mojang-api": "^0.0.2",
+    "mongo-sanitize": "^1.1.0",
     "mongoose": "^5.12.3",
     "nbt": "^0.8.1",
     "node-fetch": "^2.6.1",
