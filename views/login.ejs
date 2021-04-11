@@ -11,7 +11,7 @@
         console.log("Hacking into the mainframe")
         console.log("Ok hacked")
     }
-    
+
     function formstuff(e) {
         e.preventDefault();
         var data = JSON.stringify(Object.fromEntries(new FormData(form).entries()))
@@ -28,7 +28,7 @@
                 if (response.ok) {
                     localStorage.setItem('token', res.token);
                 } else {
-                    
+
                 }
             })
         })
