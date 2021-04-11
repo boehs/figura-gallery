@@ -1,0 +1,41 @@
+<form id="formsignin">
+    <input type="email" id="email" name="email" placeholder="email" autocomplete="off" autofocus />
+    <input type="password" id="password" name="password" placeholder="Password" />
+    <button type="submit">Submit form</button>
+</form>
+<div id="tips"></div>
+
+<script src="auth.js"></script>
+
+<script>
+    function formstuff(e) {
+        e.preventDefault();
+        var data = JSON.stringify(Object.fromEntries(new FormData(form).entries()))
+        console.log(data)
+        fetch("../api/user/login", {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: data
+        }).then(response => {
+            response.text().then(resjson => {
+                var res = JSON.parse(resjson)
+                if (response.ok) {
+                    localStorage.setItem('token', res.token);
+                } else {
+
+                }
+            })
+        })
+    };
+    isloggedon((variable) => {
+        if (variable.valid == true) {
+            window.history.back()
+        } else if (variable.code == 400) {
+            localStorage.RemoveItem('token')
+        }
+    })
+    const form = document.getElementById('formsignin');
+    form.addEventListener('submit', formstuff);
+</script>
