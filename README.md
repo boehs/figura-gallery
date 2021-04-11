@@ -5,3 +5,4 @@
 |:----------------------------------------------------------------------:|
 | Boehs |
 | Who reated the auth system |
+| And helped a lot with debugging and coding |
