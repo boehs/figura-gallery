@@ -5,14 +5,16 @@
 </form>
 <div id="tips"></div>
 
-<script type="module">
+<script src="auth.js"></script>
+
+<script>
     function formstuff(e) {
         e.preventDefault();
         var data = JSON.stringify(Object.fromEntries(new FormData(form).entries()))
         console.log(data)
         fetch("../api/user/login", {
             headers: {
-            'Content-Type': 'application/json'
+                'Content-Type': 'application/json'
             },
             method: "POST",
             body: data
@@ -22,11 +24,18 @@
                 if (response.ok) {
                     localStorage.setItem('token', res.token);
                 } else {
-                    
+
                 }
             })
         })
     };
+    isloggedon((variable) => {
+        if (variable.valid == true) {
+            window.history.back()
+        } else if (variable.code == 400) {
+            localStorage.RemoveItem('token')
+        }
+    })
     const form = document.getElementById('formsignin');
     form.addEventListener('submit', formstuff);
 </script>
