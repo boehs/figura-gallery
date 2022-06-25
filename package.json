@@ -29,7 +29,7 @@
     "mongo-sanitize": "^1.1.0",
     "mongoose": "^5.12.3",
     "nbt": "^0.8.1",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "node-gzip": "^1.1.2",
     "postcss": "^8.2.9",
     "postcss-cli": "^8.3.1",
